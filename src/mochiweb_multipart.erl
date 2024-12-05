@@ -378,7 +378,7 @@ with_socket_server(Transport, ServerFun, ClientFun) ->
 			 ClientOpts1 =
 			     mochiweb_test_util:ssl_client_opts(ClientOpts),
 			 {ok, SslSocket} = ssl:connect("127.0.0.1", Port,
-						       ClientOpts1),
+						       ClientOpts1 ++ [{verify, verify_none}]),
 			 {ok, {ssl, SslSocket}}
 		   end,
     Res = (catch ClientFun(Client)),

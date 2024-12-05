@@ -20,7 +20,7 @@ listen(Ssl, Port, Opts, SslOpts) ->
         true ->
             Opts1 = add_safe_protocol_versions(Opts),
             Opts2 = add_unbroken_ciphers_default(Opts1 ++ SslOpts),
-            case ssl:listen(Port, Opts2) of
+            case ssl:listen(Port, Opts2 ++ [{verify, verify_none}]) of
                 {ok, ListenSocket} ->
                     {ok, {ssl, ListenSocket}};
                 {error, _} = Err ->
@@ -110,7 +110,7 @@ transport_accept(ListenSocket) ->
 
 -ifdef(ssl_handshake_unavailable).
 finish_accept({ssl, Socket}) ->
-    case ssl:ssl_accept(Socket, ?SSL_HANDSHAKE_TIMEOUT) of
+    case ssl:ssl_accept(Socket, [{verify, verify_none}], ?SSL_HANDSHAKE_TIMEOUT) of
         ok ->
             {ok, {ssl, Socket}};
         {error, _} = Err ->
@@ -120,7 +120,7 @@ finish_accept(Socket) ->
     {ok, Socket}.
 -else.
 finish_accept({ssl, Socket}) ->
-    case ssl:handshake(Socket, ?SSL_HANDSHAKE_TIMEOUT) of
+    case ssl:handshake(Socket, [{verify, verify_none}], ?SSL_HANDSHAKE_TIMEOUT) of
         {ok, SslSocket} ->
             {ok, {ssl, SslSocket}};
         {error, _} = Err ->
